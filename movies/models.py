@@ -9,7 +9,7 @@ class Genre(models.Model):
     """
 
     # Fields
-    title = models.CharField(max_length=100, help_text='Enter genre title (Action, Horror, etc.)')
+    title = models.CharField(max_length=100, help_text='Enter genre title (Action, Horror, etc.)', unique=True)
     description = models.TextField(max_length=500, null=True, blank=True,
                                    help_text='Enter description of genre or leave it blank')
 
@@ -27,7 +27,7 @@ class Studio(models.Model):
     """
 
     # Fields
-    name = models.CharField(max_length=100, help_text='Enter studio name')
+    name = models.CharField(max_length=100, help_text='Enter studio name', unique=True)
 
     # Methods
     def __str__(self):
@@ -69,7 +69,7 @@ class Movie(models.Model):
     )
 
     # Fields
-    title = models.CharField(max_length=200, help_text='Enter a title of anime')
+    title = models.CharField(max_length=200, help_text='Enter a title of anime', unique=True)
     synonym = models.CharField(max_length=200, help_text='Enter a title synonym (e.g. Japanese title)', blank=True,
                                null=True)
     type = models.CharField(max_length=10, choices=TYPES,
@@ -95,6 +95,10 @@ class Movie(models.Model):
     cover_url = models.URLField(help_text='Enter a cover URL address', blank=True, null=True)
     # TODO: Movie.trailer_url check youtube.com domain
     trailer_url = models.URLField(help_text='Enter a YouTube video trailer URL', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, help_text='Set the user that added this movie', null=True,
+                             blank=True)
+    allowed = models.BooleanField(default=False, help_text='Status of publication (only moderator can set True)')
+    related = models.ManyToManyField('self', help_text='Choose related anime', blank=True)
 
     # Methods
     def __str__(self):
@@ -115,11 +119,14 @@ class Score(models.Model):
     # TODO: Score.value check: 0 < value <= 10
     value = models.PositiveSmallIntegerField(help_text='Enter your score')
     message = models.TextField(max_length=500, help_text='Justify your opinion', null=True, blank=True)
+    date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('movie', 'user')
 
     # Methods
     def __str__(self):
-        # TODO: make readable str representation
-        return self.movie.title
+        return '{0} ({1})'.format(self.user.username, self.movie.title)
 
     def get_absolute_url(self):
         return reverse('movies:score-detail', kwargs={'pk': self.pk})
@@ -132,31 +139,14 @@ class Favorite(models.Model):
 
     # Fields
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    # TODO: try ManyToManyField
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('movie', 'user')
 
     # Methods
     def __str__(self):
-        # TODO: make readable str representation
-        return self.movie.title
+        return '{0} ({1})'.format(self.user.username, self.movie.title)
 
     def get_absolute_url(self):
         return reverse('movies:favorite-detail', kwargs={'pk': self.pk})
-
-
-class Related(models.Model):
-    """
-    Show relation between movies
-    """
-
-    # Fields
-    main_movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='main_movie')
-    # TODO: check main_movie != relate_movies
-    related_movies = models.ManyToManyField(Movie, related_name='related_movies')
-
-    # Methods
-    def __str__(self):
-        return self.main_movie.title
-
-    def get_absolute_url(self):
-        return reverse('movies:related-detail', kwargs={'pk': self.pk})
