@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="title">Anime List</h1>
+    <div class="columns">
+        {% for movie in movie_list %}
+            <div class="column is-3">
+                <figure class="image is-4by5">
+                    {# TODO: Create static styles.css #}
+                    <img src="{{ movie.cover_url }}" alt="Movie cover"
+                         style="object-fit: cover; object-position: center;">
+                </figure>
+                <br>
+                <div class="content">
+                    <a href="{% url 'movies:movie-detail' movie.pk %}">
+                        <p class="subtitle">{{ movie.title }}</p>
+                    </a>
+                    {{ movie.release_date.year }}
+                    {{ movie.get_type_display }}
+                    {{ movie.get_status_display }}
+                    {{ movie.episodes }} ep.
+                    <div class="content is-small">
+                        {% for genre_element in movie.genre.all %}
+                            <a href="">{{ genre_element }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

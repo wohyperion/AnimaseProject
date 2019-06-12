@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column is-3">
+            <figure class="image is-3by4">
+                <img src="{{ movie.cover_url }}" alt="Movie cover" style="object-fit: cover; object-position: center;">
+            </figure>
+            <br>
+            <div class="content is-small">
+                {# TODO: catch added by user #}
+                <p>
+                    <strong>Added by: </strong> {{ movie.user.username }}
+                </p>
+                <p>
+                    <strong>Genres: </strong>
+                    {% for genre_element in movie.genre.all %}
+                        <a href="">{{ genre_element }}</a>{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+            <aside class="menu">
+                {# TODO: create added by and admin section #}
+                <p class="menu-label">Actions</p>
+                <ul class="menu-list">
+                    <li><a href="">Favorite it</a></li>
+                    <li><a href="">Set a score</a></li>
+                    {% if movie.trailer_url %}
+                        <li><a href="{{ movie.trailer_url }}" target="_blank">Video trailer</a></li>
+                    {% endif %}
+                </ul>
+            </aside>
+        </div>
+        <div class="column">
+            <div class="content">
+                <h1 class="title">{{ movie.title }}</h1>
+                <p class="subtitle">{{ movie.synonym }}</p>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="content">
+                        <p><strong>Type: </strong>{{ movie.get_type_display }}</p>
+                        <p><strong>Status: </strong>{{ movie.get_status_display }}</p>
+                        <p><strong>Release date: </strong>{{ movie.release_date }}</p>
+                        {% if movie.end_date %}
+                            <p><strong>End date: </strong>{{ movie.end_date }}</p>
+                        {% else %}
+                            <p><strong>End date: </strong>Unknown</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="content">
+                        <p><strong>Source: </strong>{{ movie.get_source_display }}</p>
+                        <p><strong>Studio: </strong>{{ movie.studio.name }}</p>
+                        <p><strong>Episodes: </strong>{{ movie.episodes }} ep.</p>
+                        <p><strong>Duration: </strong>{{ movie.duration }} min. per ep.</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="content">
+                {% if movie.related.count > 0 %}
+                    <p class="subtitle">Related Anime</p>
+                    {% for related in movie.related.all %}
+                        <p><a href="{% url 'movies:movie-detail' related.pk %}">{{ related.title }}</a></p>
+                    {% endfor %}
+                {% endif %}
+                <p class="subtitle">Summary</p>
+                <p>
+                    {% if movie.summary %}
+                        {{ movie.summary }}
+                    {% else %}
+                        This movie description is missing ...
+                    {% endif %}
+                </p>
+                <p class="subtitle">Scores and Comments</p>
+                {% if movie.score_set.all.count > 0 %}
+                    {% for score in movie.score_set.all %}
+                        <article class="media">
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <strong>
+                                            {{ score.user.first_name }}
+                                            {{ score.user.last_name }}
+                                        </strong>
+                                        <small>
+                                            @{{ score.user.username }}
+                                            {{ score.date }}
+                                        </small>
+                                        <br>
+                                        {{ score.message }}
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                {% else %}
+                    <p>
+                        Nobody set a score to this anime.
+                        <a href="">You can be first!</a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
