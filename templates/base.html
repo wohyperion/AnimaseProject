@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
 </head>
 <body>
+{% include 'navbar.html' %}
 <section class="section">
     <div class="container">
-        <h1 class="title">Hello, World!</h1>
-        <p class="subtitle">My first website with <strong>Bulma</strong>!</p>
+        {% block content %}
+            <h1 class="title">Hello, World!</h1>
+            <p class="subtitle">My first website with <strong>Bulma</strong>!</p>
+        {% endblock %}
     </div>
 </section>
 </body>
