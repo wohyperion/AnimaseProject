@@ -1,0 +1,74 @@
+{% if is_paginated and page_obj.paginator.num_pages > 2 %}
+    <nav class="pagination" role="navigation" aria-label="pagination">
+        {% if page_obj.has_previous %}
+            <a class="pagination-previous" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% else %}
+            <a class="pagination-previous" title="This is the first page" disabled>Previous</a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a class="pagination-next" href="?page={{ page_obj.next_page_number }}">Next page</a>
+        {% else %}
+            <a class="pagination-next" title="This is the last page" disabled>Next page</a>
+        {% endif %}
+        <ul class="pagination-list">
+            <li>
+                {% if page_obj.has_previous and page_obj.has_next %}
+                    <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">
+                        {{ page_obj.previous_page_number }}
+                    </a>
+                {% elif not page_obj.has_next %}
+                    <a class="pagination-link" aria-current="page"
+                       href="?page={{ page_obj.number|add:"-2" }}">{{ page_obj.number|add:"-2" }}</a>
+                {% else %}
+                    <a class="pagination-link is-current" aria-current="page">1</a>
+                {% endif %}
+            </li>
+            <li>
+                {% if page_obj.number > 1 and page_obj.has_next %}
+                    <a class="pagination-link is-current">{{ page_obj.number }}</a>
+                {% elif not page_obj.has_previous %}
+                    <a class="pagination-link" href="?page=2">2</a>
+                {% else %}
+                    <a class="pagination-link"
+                       href="?page={{ page_obj.number|add:"-1" }}">{{ page_obj.number|add:"-1" }}</a>
+                {% endif %}
+            </li>
+            <li>
+                {% if page_obj.has_next and page_obj.number > 1 %}
+                    <a class="pagination-link"
+                       href="?page={{ page_obj.next_page_number }}">
+                        {{ page_obj.next_page_number }}
+                    </a>
+                {% elif page_obj.number == 1 %}
+                    <a class="pagination-link" href="?page=3">3</a>
+                {% else %}
+                    <a class="pagination-link is-current">{{ page_obj.number }}</a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+{% elif is_paginated %}
+    <nav class="pagination" role="navigation" aria-label="pagination">
+        {% if page_obj.has_previous %}
+            <a class="pagination-previous" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% else %}
+            <a class="pagination-previous" title="This is the first page" disabled>Previous</a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a class="pagination-next" href="?page={{ page_obj.next_page_number }}">Next page</a>
+        {% else %}
+            <a class="pagination-next" title="This is the last page" disabled>Next page</a>
+        {% endif %}
+        <ul class="pagination-list">
+            {% if page_obj.has_previous %}
+                <li><a href="?page=1" class="pagination-link">1</a></li>
+                <li><a class="pagination-link is-current">2</a></li>
+            {% else %}
+                <li><a class="pagination-link is-current">1</a></li>
+                <li><a href="?page=2" class="pagination-link">2</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
