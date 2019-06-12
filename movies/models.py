@@ -10,8 +10,6 @@ class Genre(models.Model):
 
     # Fields
     title = models.CharField(max_length=100, help_text='Enter genre title (Action, Horror, etc.)', unique=True)
-    description = models.TextField(max_length=500, null=True, blank=True,
-                                   help_text='Enter description of genre or leave it blank')
 
     # Methods
     def __str__(self):
@@ -97,8 +95,12 @@ class Movie(models.Model):
     trailer_url = models.URLField(help_text='Enter a YouTube video trailer URL', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, help_text='Set the user that added this movie', null=True,
                              blank=True)
+    added_date = models.DateTimeField(auto_now=True)
     allowed = models.BooleanField(default=False, help_text='Status of publication (only moderator can set True)')
     related = models.ManyToManyField('self', help_text='Choose related anime', blank=True)
+
+    class Meta:
+        ordering = ['-added_date']
 
     # Methods
     def __str__(self):
@@ -140,6 +142,7 @@ class Favorite(models.Model):
     # Fields
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('movie', 'user')
