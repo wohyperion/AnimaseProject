@@ -8,14 +8,16 @@
             </figure>
             <br>
             <div class="content is-small">
-                {# TODO: catch added by user #}
                 <p>
                     <strong>Added by: </strong> {{ movie.user.username }}
+                    <span class="is-pulled-right">{{ movie.added_date }}</span>
                 </p>
                 <p>
                     <strong>Genres: </strong>
                     {% for genre_element in movie.genre.all %}
-                        <a href="">{{ genre_element }}</a>{% if not forloop.last %},{% endif %}
+                        <a href="{% url 'movies:genre-detail' genre_element.title %}">
+                            {{ genre_element }}
+                        </a>
                     {% endfor %}
                 </p>
             </div>
@@ -62,17 +64,17 @@
             <div class="content">
                 {% if movie.related.count > 0 %}
                     <p class="subtitle">Related Anime</p>
-                    {% for related in movie.related.all %}
-                        <p><a href="{% url 'movies:movie-detail' related.pk %}">{{ related.title }}</a></p>
+                    {% for related in movie.related.all|dictsort:"release_date.year" %}
+                        <p>
+                            <a href="{% url 'movies:movie-detail' related.pk %}">
+                                {{ related.title }} ({{ related.release_date.year }})
+                            </a>
+                        </p>
                     {% endfor %}
                 {% endif %}
                 <p class="subtitle">Summary</p>
                 <p>
-                    {% if movie.summary %}
-                        {{ movie.summary }}
-                    {% else %}
-                        This movie description is missing ...
-                    {% endif %}
+                    {{ movie.summary|default:"This movie description is missing ..." }}
                 </p>
                 <p class="subtitle">Scores and Comments</p>
                 {% if movie.score_set.all.count > 0 %}
