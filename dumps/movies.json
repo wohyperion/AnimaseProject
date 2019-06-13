@@ -319,6 +319,61 @@
     }
 },
 {
+    "model": "movies.score",
+    "pk": 2,
+    "fields": {
+        "movie": 3,
+        "user": 1,
+        "value": 8,
+        "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vehicula euismod elementum. Vestibulum venenatis lacus metus, quis mattis leo congue ut. In in est at turpis euismod bibendum. Donec arcu mi, viverra aliquet nulla non, fringilla sagittis neque. Quisque et viverra velit, quis gravida ex. Pellentesque euismod metus id urna posuere, in mollis orci vulputate. Donec eu faucibus lacus. Pellentesque tincidunt, dui a efficitur tempor, est magna venenatis ex, at blandit nisl risus a arcu. Quisq",
+        "date": "2019-06-13T15:13:33.908Z"
+    }
+},
+{
+    "model": "movies.score",
+    "pk": 3,
+    "fields": {
+        "movie": 4,
+        "user": 1,
+        "value": 9,
+        "message": "Aenean id efficitur ex. Pellentesque eget mattis magna. Morbi vel congue nunc. Nam aliquam efficitur ornare. Morbi sodales enim et leo dignissim sollicitudin. Vivamus sit amet augue mi. Curabitur ornare est non suscipit gravida. Nunc lorem risus, porttitor at porta sit amet, posuere non nisi. Phasellus est dolor, pretium et metus et, ornare porta nulla.",
+        "date": "2019-06-13T15:13:50.728Z"
+    }
+},
+{
+    "model": "movies.score",
+    "pk": 4,
+    "fields": {
+        "movie": 5,
+        "user": 1,
+        "value": 8,
+        "message": "Aenean quis condimentum est. Nullam a lobortis turpis, et pellentesque lectus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aliquam fringilla molestie sodales. Duis ut efficitur elit, vitae aliquet nulla. Donec ultricies rutrum massa, non tristique tellus fermentum non. Quisque volutpat auctor nisl, vitae rutrum ipsum semper non. Sed efficitur nisi vel sem lobortis tincidunt. Integer elementum convallis ullamcorper. Morbi venenatis ullamcorper convallis.",
+        "date": "2019-06-13T15:14:04.367Z"
+    }
+},
+{
+    "model": "movies.score",
+    "pk": 5,
+    "fields": {
+        "movie": 6,
+        "user": 1,
+        "value": 5,
+        "message": "Mauris at elit orci. Nulla vitae elit est. Vestibulum viverra lectus et arcu aliquam ultrices. Nunc est risus, suscipit a ultrices at, sagittis et leo. Sed elit arcu, hendrerit vitae dignissim at, dictum quis eros. Fusce maximus luctus arcu, id dictum erat fermentum sit amet. Mauris vitae eros rhoncus, ultricies sem sed, iaculis est. Etiam molestie auctor ex at posuere. Mauris convallis eu lorem et posuere. Quisque ultrices nisl ipsum, rhoncus tempus orci placerat in. Pellentesque et magna at ni",
+        "date": "2019-06-13T15:14:18.256Z"
+    }
+},
+{
+    "model": "movies.score",
+    "pk": 6,
+    "fields": {
+        "movie": 3,
+        "user": 2,
+        "value": 4,
+        "message": "In eros ipsum, molestie sed scelerisque sed, facilisis id risus. Nullam maximus cursus nulla vel tincidunt. Cras non blandit purus, ac scelerisque eros. Mauris aliquam rutrum odio feugiat ullamcorper. Maecenas consequat nulla quis libero accumsan, in rhoncus nisi efficitur. Etiam commodo elementum ullamcorper. Praesent volutpat ullamcorper venenatis. Nam faucibus fringilla lacus, et aliquet turpis. Ut ut enim massa. Aliquam eu neque pulvinar, aliquam elit sollicitudin, semper tortor. Nulla eleme",
+        "date": "2019-06-13T15:54:25.838Z"
+    }
+},
+{
     "model": "movies.favorite",
     "pk": 1,
     "fields": {
