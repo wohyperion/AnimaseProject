@@ -76,21 +76,40 @@
                 <p>
                     {{ movie.summary|default:"This movie description is missing ..." }}
                 </p>
-                <p class="subtitle">Scores and Comments</p>
+                <br>
+                <p class="subtitle">
+                    Latest scores
+                    <span class="is-pulled-right">
+                        <a href="">Show all</a>
+                    </span>
+                </p>
                 {% if movie.score_set.all.count > 0 %}
-                    {% for score in movie.score_set.all %}
+                    {% for score in movie.score_set.all|dictsortreversed:"date"|slice:"10" %}
                         <article class="media">
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <strong>
-                                            {{ score.user.first_name }}
-                                            {{ score.user.last_name }}
-                                        </strong>
-                                        <small>
-                                            @{{ score.user.username }}
-                                            {{ score.date }}
-                                        </small>
+                                        {% if score.user.first_name and score.user.last_name %}
+                                            <strong>
+                                                {{ score.user.first_name }}
+                                                {{ score.user.last_name }}
+                                            </strong>
+                                            <span class="tag is-dark is-pulled-right">
+                                                {{ score.value }}
+                                            </span>
+                                            <br>
+                                            <small>
+                                                @{{ score.user.username }}
+                                                {{ score.date }}
+                                            </small>
+                                        {% else %}
+                                            <strong>@{{ score.user.username }}</strong>
+                                            <span class="tag is-dark is-pulled-right">
+                                                {{ score.value }}
+                                            </span>
+                                            <br>
+                                            <small>{{ score.date }}</small>
+                                        {% endif %}
                                         <br>
                                         {{ score.message }}
                                     </p>

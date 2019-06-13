@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
 
-from .models import (Movie, Genre)
+from .models import (Movie, Genre, Score)
 
 
 # Create your views here.
@@ -13,11 +13,16 @@ def index(request):
 class MovieListView(ListView):
     model = Movie
     paginate_by = 24
+    ordering = ['-added_date']
 
     def get_context_data(self, **kwargs):
         context = super(MovieListView, self).get_context_data()
         context['genre_list'] = Genre.objects.all()
         return context
+
+
+class MovieDetailView(DetailView):
+    model = Movie
 
 
 class GenreMovieListView(ListView):
@@ -36,5 +41,7 @@ class GenreMovieListView(ListView):
         return context
 
 
-class MovieDetailView(DetailView):
-    model = Movie
+class ScoreListView(ListView):
+    model = Score
+    paginate_by = 24
+    ordering = ['-date']

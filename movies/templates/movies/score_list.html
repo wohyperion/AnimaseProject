@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="title">Latest Scores</h1>
+
+    <div class="columns is-multiline">
+        {% for score in score_list|dictsortreversed:"date" %}
+            <div class="column is-4">
+                <div class="box">
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
+                                <p class="is-marginless">
+                                    <strong>
+                                        <a href="{% url 'movies:movie-detail' score.movie.pk %}">
+                                            {{ score.movie.title }}
+                                        </a>
+                                    </strong>
+                                    <span class="tag is-dark is-pulled-right">
+                                        {{ score.value }}
+                                    </span>
+                                </p>
+                                <p>
+                                    <small>
+                                        @{{ score.user.username }}
+                                        {{ score.date }}
+                                    </small>
+                                    <br>
+                                    {{ score.message }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% include 'movies/includes/paginator.html' %}
+{% endblock %}
