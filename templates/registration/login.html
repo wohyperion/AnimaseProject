@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+{#    {% if next %}#}
+{#        {% if user.is_authenticated %}#}
+{#            <p>#}
+{#                Your account doesn't have access to this page. To proceed, please login with an account that has access.#}
+{#            </p>#}
+{#        {% else %}#}
+{#            <p>Please login to see this page.</p>#}
+{#        {% endif %}#}
+{#    {% endif %}#}
+
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label class="label">{{ form.username.label_tag }}</label>
+            <div class="control has-icons-left">
+                <input class="input" id="id_username" name="username" type="text" required autofocus
+                       placeholder="Enter your username">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-user"></i>
+                </span>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">{{ form.password.label_tag }}</label>
+            <div class="control has-icons-left">
+                <input class="input" id="id_password" name="password" type="password" placeholder="Enter your password">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-lock"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="field">
+            <p class="control">
+                <input type="submit" value="Login" class="button is-success">
+                <input type="hidden" name="next" value="{{ next }}">
+            </p>
+        </div>
+    </form>
+{% endblock %}
