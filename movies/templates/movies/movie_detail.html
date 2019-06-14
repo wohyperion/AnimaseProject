@@ -31,12 +31,36 @@
                         <li><a href="{{ movie.trailer_url }}" target="_blank">Video trailer</a></li>
                     {% endif %}
                 </ul>
+                {% if movie.related.count > 0 %}
+                    <p class="menu-label">Related anime</p>
+                    <ul class="menu-list">
+                        {% for related in movie.related.all|dictsort:"release_date.year" %}
+                            <li>
+                                <a href="{% url 'movies:movie-detail' related.pk %}">
+                                    {{ related.title }}
+                                    <span class="is-pulled-right">({{ related.release_date.year }})</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
             </aside>
         </div>
         <div class="column">
             <div class="content">
                 <h1 class="title">{{ movie.title }}</h1>
                 <p class="subtitle">{{ movie.synonym }}</p>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <strong>User rate: </strong>{{ movie.rate.average_rate }}
+                </div>
+                <div class="column">
+                    <strong>Scores: </strong>{{ movie.score_set.all.count }}
+                </div>
+                <div class="column">
+                    <strong>Favorites: </strong>{{ movie.favorite_set.all.count }}
+                </div>
             </div>
             <div class="columns">
                 <div class="column">
@@ -62,23 +86,13 @@
             </div>
             <br>
             <div class="content">
-                {% if movie.related.count > 0 %}
-                    <p class="subtitle">Related Anime</p>
-                    {% for related in movie.related.all|dictsort:"release_date.year" %}
-                        <p>
-                            <a href="{% url 'movies:movie-detail' related.pk %}">
-                                {{ related.title }} ({{ related.release_date.year }})
-                            </a>
-                        </p>
-                    {% endfor %}
-                {% endif %}
                 <p class="subtitle">Summary</p>
                 <p>
                     {{ movie.summary|default:"This movie description is missing ..." }}
                 </p>
                 <br>
                 <p class="subtitle">
-                    Latest scores
+                    Latest reviews
                     <span class="is-pulled-right">
                         <a href="">Show all</a>
                     </span>

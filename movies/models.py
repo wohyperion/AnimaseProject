@@ -109,6 +109,10 @@ class Movie(models.Model):
     def get_absolute_url(self):
         return reverse('movies:movie-detail', kwargs={'pk': self.pk})
 
+    @property
+    def rate(self):
+        return self.score_set.aggregate(average_rate=models.Avg('value'))
+
 
 class Score(models.Model):
     """
