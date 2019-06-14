@@ -7,7 +7,28 @@
                 <img src="{{ movie.cover_url }}" alt="Movie cover" style="object-fit: cover; object-position: center;">
             </figure>
             <br>
-            <div class="content is-small">
+            <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Scores</span>
+                        <span class="tag is-info">{{ movie.score_set.count }}</span>
+                    </div>
+                </div>
+                <div class="control">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Rate</span>
+                        <span class="tag is-success">{{ movie.rate.average_rate }}</span>
+                    </div>
+                </div>
+                <div class="control">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Favorites</span>
+                        <span class="tag is-danger">{{ movie.favorite_set.count }}</span>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="content is-small is-marginless">
                 <p>
                     <strong>Added by: </strong> {{ movie.user.username }}
                     <span class="is-pulled-right">{{ movie.added_date }}</span>
@@ -21,6 +42,7 @@
                     {% endfor %}
                 </p>
             </div>
+            <hr>
             <aside class="menu">
                 {# TODO: create added by and admin section #}
                 <p class="menu-label">Actions</p>
@@ -31,6 +53,16 @@
                         <li><a href="{{ movie.trailer_url }}" target="_blank">Video trailer</a></li>
                     {% endif %}
                 </ul>
+                {% if movie.user == user or user.is_superuser %}
+                    <p class="menu-label">Creator Actions</p>
+                    <ul class="menu-list">
+                        <li><a href="">Edit</a></li>
+                        {% if user.is_superuser %}
+                            <li><a href="">Hide</a></li>
+                            <li><a href="">Delete</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
                 {% if movie.related.count > 0 %}
                     <p class="menu-label">Related anime</p>
                     <ul class="menu-list">
@@ -46,21 +78,11 @@
                 {% endif %}
             </aside>
         </div>
+
         <div class="column">
             <div class="content">
                 <h1 class="title">{{ movie.title }}</h1>
                 <p class="subtitle">{{ movie.synonym }}</p>
-            </div>
-            <div class="columns">
-                <div class="column">
-                    <strong>User rate: </strong>{{ movie.rate.average_rate }}
-                </div>
-                <div class="column">
-                    <strong>Scores: </strong>{{ movie.score_set.all.count }}
-                </div>
-                <div class="column">
-                    <strong>Favorites: </strong>{{ movie.favorite_set.all.count }}
-                </div>
             </div>
             <div class="columns">
                 <div class="column">
@@ -93,9 +115,11 @@
                 <br>
                 <p class="subtitle">
                     Latest reviews
-                    <span class="is-pulled-right">
-                        <a href="">Show all</a>
-                    </span>
+                    {% if movie.score_set.count > 10 %}
+                        <span class="is-pulled-right">
+                            <a href="">Show all ({{ movie.score_set.count }})</a>
+                        </span>
+                    {% endif %}
                 </p>
                 {% if movie.score_set.all.count > 0 %}
                     {% for score in movie.score_set.all|dictsortreversed:"date"|slice:"10" %}

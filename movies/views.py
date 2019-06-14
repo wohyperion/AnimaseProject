@@ -1,13 +1,9 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 
 from .models import (Movie, Genre, Score)
-
-
-# Create your views here.
-def index(request):
-    context = {}
-    return render(request, 'base.html', context)
 
 
 class MovieListView(ListView):
@@ -25,7 +21,16 @@ class MovieDetailView(DetailView):
     model = Movie
 
 
-class GenreMovieListView(ListView):
+class MovieToFavoriteView(View):
+
+    def post(self, request, *args, **kwargs):
+        print(request)
+        print(args)
+        print(kwargs)
+        return HttpResponse('Movie ID: {0}'.format(self.kwargs['pk']))
+
+
+class MovieByGenreListView(ListView):
     model = Movie
     paginate_by = 24
     template_name = 'movies/movie_by_genre.html'
@@ -35,7 +40,7 @@ class GenreMovieListView(ListView):
         return Movie.objects.filter(genre=genre)
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(GenreMovieListView, self).get_context_data()
+        context = super(MovieByGenreListView, self).get_context_data()
         context['genre_list'] = Genre.objects.all()
         context['genre'] = get_object_or_404(Genre, title=self.kwargs['genre'])
         return context
