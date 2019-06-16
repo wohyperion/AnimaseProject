@@ -1,9 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 
-from .models import (Movie, Genre, Score)
+from .models import (Movie, Genre, Score, Favorite)
 
 
 class MovieListView(ListView):
@@ -20,14 +19,16 @@ class MovieListView(ListView):
 class MovieDetailView(DetailView):
     model = Movie
 
+    def get_context_data(self, **kwargs):
+        context = super(MovieDetailView, self).get_context_data()
 
-class MovieToFavoriteView(View):
+        try:
+            favorite = Favorite.objects.get(movie_id=self.kwargs['pk'], user_id=self.request.user.pk)
+        except Favorite.DoesNotExist:
+            favorite = None
 
-    def post(self, request, *args, **kwargs):
-        print(request)
-        print(args)
-        print(kwargs)
-        return HttpResponse('Movie ID: {0}'.format(self.kwargs['pk']))
+        context['favorite'] = favorite
+        return context
 
 
 class MovieByGenreListView(ListView):
@@ -50,3 +51,22 @@ class ScoreListView(ListView):
     model = Score
     paginate_by = 24
     ordering = ['-date']
+
+
+class FavoriteMovieView(View):
+    http_method_names = ['post', 'delete']
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden()
+
+        if get_object_or_404(Movie, pk=self.kwargs['pk']):
+            obj, created = Favorite.objects.get_or_create(
+                movie_id=self.kwargs['pk'],
+                user_id=request.user.pk
+            )
+
+            if not created:
+                obj.delete()
+
+            return HttpResponse(created)
