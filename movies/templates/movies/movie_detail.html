@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="columns">
+    <div class="columns" id="main-content">
         <div class="column is-3">
             <figure class="image is-3by4">
                 <img src="{{ movie.cover_url }}" alt="Movie cover" style="object-fit: cover; object-position: center;">
@@ -23,7 +23,7 @@
                 <div class="control">
                     <div class="tags has-addons">
                         <span class="tag is-dark">Favorites</span>
-                        <span class="tag is-danger">{{ movie.favorite_set.count }}</span>
+                        <span class="tag is-danger" id="favorite-count">{{ movie.favorite_set.count }}</span>
                     </div>
                 </div>
             </div>
@@ -47,7 +47,11 @@
                 {# TODO: create added by and admin section #}
                 <p class="menu-label">Actions</p>
                 <ul class="menu-list">
-                    <li><a href="">Favorite it</a></li>
+                    {% if favorite %}
+                        <li id="favorite-button"><a href="">Unfavorite</a></li>
+                    {% else %}
+                        <li id="favorite-button"><a href="">Favorite</a></li>
+                    {% endif %}
                     <li><a href="">Set a score</a></li>
                     {% if movie.trailer_url %}
                         <li><a href="{{ movie.trailer_url }}" target="_blank">Video trailer</a></li>
@@ -164,4 +168,10 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {% load staticfiles %}
+    <script src="{% static 'movies/js/app.js' %}"></script>
+    <script src="{% static 'movies/js/movie_detail.js' %}"></script>
 {% endblock %}
