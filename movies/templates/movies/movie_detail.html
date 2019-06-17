@@ -60,7 +60,7 @@
                 {% if movie.user == user or user.is_superuser %}
                     <p class="menu-label">Creator Actions</p>
                     <ul class="menu-list">
-                        <li><a href="">Edit</a></li>
+                        <li><a href="{% url 'movies:movie-update' movie.pk %}">Edit</a></li>
                         {% if user.is_superuser %}
                             <li><a href="">Hide</a></li>
                             <li><a href="">Delete</a></li>
@@ -96,6 +96,8 @@
                         <p><strong>Release date: </strong>{{ movie.release_date }}</p>
                         {% if movie.end_date %}
                             <p><strong>End date: </strong>{{ movie.end_date }}</p>
+                        {% elif movie.get_status_display == 'Completed' %}
+                            <p><strong>End date: </strong>{{ movie.release_date }}</p>
                         {% else %}
                             <p><strong>End date: </strong>Unknown</p>
                         {% endif %}
