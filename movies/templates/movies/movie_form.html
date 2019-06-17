@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="title">Add new anime</h1>
+    <form action="." method="post">
+        {% csrf_token %}
+        <div class="columns is-multiline">
+            <div class="column is-12">
+                <div class="columns">
+                    {# Anime title #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.title.id_for_label }}" class="label">
+                                {{ form.title.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.title.html_name }}"
+                                       maxlength="200" required id="{{ form.title.id_for_label }}"
+                                       placeholder="Steins;Gate" value="{{ form.title.value|default:"" }}">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.title.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Type of anime #}
+                    <div class="column is-2">
+                        <div class="field">
+                            <label for="{{ form.type.id_for_label }}" class="label">
+                                {{ form.type.label_tag }}
+                            </label>
+                            <div class="select is-fullwidth">
+                                <select name="{{ form.type.html_name }}" id="{{ form.type.id_for_label }}" required>
+                                    {% for choice in form.type.field.choices|slice:"1:" %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current.type == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">{{ form.type.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Current status #}
+                    <div class="column is-2">
+                        <div class="field">
+                            <label for="{{ form.status.id_for_label }}" class="label">
+                                {{ form.status.label_tag }}
+                            </label>
+                            <div class="select is-fullwidth">
+                                <select name="{{ form.status.html_name }}" id="{{ form.status.id_for_label }}" required>
+                                    {% for choice in form.status.field.choices|slice:"1:" %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current.status == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">{{ form.status.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Anime source #}
+                    <div class="column is-2">
+                        <div class="field">
+                            <label for="{{ form.source.id_for_label }}" class="label">
+                                {{ form.source.label_tag }}
+                            </label>
+                            <div class="select is-fullwidth">
+                                <select name="{{ form.source.html_name }}" id="{{ form.source.id_for_label }}" required>
+                                    {% for choice in form.source.field.choices|slice:"1:" %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current.source == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">{{ form.source.help_text }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column is-12">
+                <div class="columns">
+                    {# Title synonym #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.synonym.id_for_label }}" class="label">
+                                {{ form.synonym.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.synonym.html_name }}"
+                                       maxlength="200" id="{{ form.synonym.id_for_label }}"
+                                       placeholder="STEINS;GATE" value="{{ form.synonym.value|default:"" }}">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.synonym.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Studio #}
+                    <div class="column is-3">
+                        <div class="field">
+                            <label for="{{ form.studio.id_for_label }}" class="label">
+                                {{ form.studio.label_tag }}
+                            </label>
+                            <div class="field is-horizontal">
+                                <div class="field-body">
+                                    <div class="field">
+                                        <div class="select is-fullwidth">
+                                            <select name="{{ form.studio.html_name }}"
+                                                    id="{{ form.studio.id_for_label }}"
+                                                    required>
+                                                {% for choice in form.studio.field.choices %}
+                                                    <option value="{{ choice.0 }}"
+                                                            {% if current.studio == choice.0 %}selected{% endif %}>
+                                                        {{ choice.1 }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <p class="is-size-7 has-text-grey">{{ form.studio.help_text }}</p>
+                                    </div>
+                                    <div class="field">
+                                        <a href="" class="button is-primary is-fullwidth" id="studio-add-button">+</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {# Age rating #}
+                    <div class="column is-3">
+                        <div class="field">
+                            <label for="{{ form.rating.id_for_label }}" class="label">
+                                {{ form.rating.label_tag }}
+                            </label>
+                            <div class="select is-fullwidth">
+                                <select name="{{ form.rating.html_name }}" id="{{ form.rating.id_for_label }}"
+                                        required>
+                                    {% for choice in form.rating.field.choices|slice:"1:" %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current.rating == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">{{ form.rating.help_text }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            {# Poster URL #}
+            <div class="column is-6">
+                <div class="field">
+                    <label for="{{ form.cover_url.id_for_label }}" class="label">
+                        {{ form.cover_url.label_tag }}
+                    </label>
+                    <p class="control is-expanded">
+                        <input class="input" type="url" name="{{ form.cover_url.html_name }}"
+                               maxlength="200" required id="{{ form.cover_url.id_for_label }}"
+                               placeholder="https://cdn.myanimelist.net/images/anime/5/73199l.jpg"
+                               value="{{ form.cover_url.value|default:"" }}">
+                    </p>
+                    <p class="is-size-7 has-text-grey">{{ form.cover_url.help_text }}</p>
+                </div>
+            </div>
+            {# Trailer URL #}
+            <div class="column is-6">
+                <div class="field">
+                    <label for="{{ form.trailer_url.id_for_label }}" class="label">
+                        {{ form.trailer_url.label_tag }}
+                    </label>
+                    <p class="control is-expanded">
+                        <input class="input" type="url" name="{{ form.trailer_url.html_name }}"
+                               maxlength="200" required id="{{ form.trailer_url.id_for_label }}"
+                               placeholder="https://youtu.be/27OZc-ku6is"
+                               value="{{ form.trailer_url.value|default:"" }}">
+                    </p>
+                    <p class="is-size-7 has-text-grey">{{ form.trailer_url.help_text }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="columns">
+                    {# Anime genres #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.genre.id_for_label }}" class="label">
+                                {{ form.genre.label_tag }}
+                            </label>
+                            <div class="field is-horizontal" style="margin-bottom: 14px;">
+                                <div class="field-body">
+                                    <div class="field">
+                                        <input class="input" type="text" placeholder="Search genres"
+                                               id="genre-search-field">
+                                    </div>
+                                    <div class="field">
+                                        <a class="button is-primary is-fullwidth" id="genre-add-button">+</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="select is-fullwidth is-multiple">
+                                <select name="{{ form.genre.html_name }}" id="{{ form.genre.id_for_label }}"
+                                        required multiple size="9" style="height: 100%;">
+                                    {% for choice in form.genre.field.choices %}
+                                        <option value="{{ choice.0 }}" class="genres-list"
+                                                {% if choice.0 in current.genres %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">
+                                {{ form.genre.help_text }}
+                                (Hold Ctrl to choose multiple)
+                            </p>
+                        </div>
+                    </div>
+                    {# Related anime #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.related.id_for_label }}" class="label">
+                                {{ form.related.label_tag }}
+                            </label>
+                            <div class="field is-horizontal" style="margin-bottom: 14px;">
+                                <div class="field-body">
+                                    <div class="field">
+                                        <input class="input" type="text" placeholder="Search related anime"
+                                               id="related-search-field">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="select is-fullwidth is-multiple">
+                                <select name="{{ form.related.html_name }}" id="{{ form.related.id_for_label }}"
+                                        multiple size="9">
+                                    {% for choice in form.related.field.choices %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if choice.0 in current.related %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="is-size-7 has-text-grey">
+                                {{ form.related.help_text }}
+                                (Hold Ctrl to choose multiple)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="columns is-multiline">
+                    {# Number of episodes #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.episodes.id_for_label }}" class="label">
+                                {{ form.episodes.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.episodes.html_name }}"
+                                       id="{{ form.episodes.id_for_label }}" value="{{ form.episodes.value }}"
+                                       placeholder="24">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.episodes.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Duration of one episode #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.duration.id_for_label }}" class="label">
+                                {{ form.duration.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.duration.html_name }}"
+                                       id="{{ form.duration.id_for_label }}" value="{{ form.duration.value }}"
+                                       placeholder="24">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.duration.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Release date #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.release_date.id_for_label }}" class="label">
+                                {{ form.release_date.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.release_date.html_name }}"
+                                       id="{{ form.release_date.id_for_label }}" placeholder="06.04.2011"
+                                       value="{{ form.release_date.value|default:""|date:"d.m.Y" }}">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.release_date.help_text }}</p>
+                        </div>
+                    </div>
+                    {# End date #}
+                    <div class="column is-6">
+                        <div class="field">
+                            <label for="{{ form.end_date.id_for_label }}" class="label">
+                                {{ form.end_date.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <input class="input" type="text" name="{{ form.end_date.html_name }}"
+                                       id="{{ form.end_date.id_for_label }}" placeholder="14.09.2011"
+                                       value="{{ form.end_date.value|default:""|date:"d.m.Y" }}">
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.end_date.help_text }}</p>
+                        </div>
+                    </div>
+                    {# Description #}
+                    <div class="column is-12">
+                        <div class="field">
+                            <label for="{{ form.summary.id_for_label }}" class="label">
+                                {{ form.summary.label_tag }}
+                            </label>
+                            <p class="control is-expanded">
+                                <textarea class="textarea" type="text" name="{{ form.summary.html_name }}"
+                                          id="{{ form.summary.id_for_label }}" rows="6" maxlength="1000"
+                                          placeholder="Enter a description of anime">
+                                    {{ form.summary.value|default:"" }}
+                                </textarea>
+                            </p>
+                            <p class="is-size-7 has-text-grey">{{ form.summary.help_text }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <p class="control">
+                <input type="submit" value="Submit" class="button is-success">
+                <input type="hidden" name="next" value="{{ next }}">
+            </p>
+        </div>
+    </form>
+
+    {% include 'movies/includes/genre_modal.html' %}
+    {% include 'movies/includes/studio_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+    {% load staticfiles %}
+    <script src="{% static 'movies/js/app.js' %}"></script>
+    <script src="{% static 'movies/js/movie_form.js' %}"></script>
+{% endblock %}
