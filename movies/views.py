@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -183,6 +183,15 @@ class MovieUpdateView(LoginRequiredMixin, UpdateView):
         raise PermissionDenied()
 
 
+# Delete movies view [movie-delete]
+class MovieDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Movie
+    login_url = reverse_lazy('login')
+    permission_required = ['movies.can_toggle_allowed']
+    permission_denied_message = 'You\'r should be creator!'
+    success_url = reverse_lazy('movies:index')
+
+
 # Endpoint for create new genres on MovieCreateView/MovieUpdateView pages [genre-create]
 class GenreModalView(View):
     http_method_names = ['post']
@@ -267,3 +276,16 @@ class StudioModalView(View):
             return HttpResponse(f'{obj.pk},{obj.name}')
 
         return HttpResponse(created)
+
+
+class UserDetailView(LoginRequiredMixin, TemplateView):
+    template_name = 'movies/user_detail.html'
+    login_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data()
+        user = self.request.user
+
+        context['user'] = user
+
+        return context
