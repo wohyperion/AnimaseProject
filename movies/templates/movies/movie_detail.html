@@ -66,7 +66,7 @@
                             {% else %}
                                 <li><a id="hide-button">Hide</a></li>
                             {% endif %}
-                            <li><a href="">Delete</a></li>
+                            <li><a href="{% url 'movies:movie-delete' movie.pk %}">Delete</a></li>
                         {% endif %}
                     </ul>
                 {% endif %}
@@ -170,6 +170,14 @@
                             </form>
                         </div>
                     </article>
+                {% elif not request.user.is_authenticated %}
+                    <div class="content">
+                        <p class="subtitle">
+                            Please
+                            <a href="{% url 'login' %}?next=/movies/{{ movie.pk }}/">log in</a>
+                            to your profile to post reviews!
+                        </p>
+                    </div>
                 {% endif %}
                 {% for score in movie.score_set.all|dictsortreversed:"date"|slice:"10" %}
                     <article class="media">

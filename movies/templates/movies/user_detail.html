@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column is-8">
+            <div class="content">
+                <p class="subtitle">Profile info:</p>
+                <p><strong>Username: </strong>{{ user.username }}</p>
+                {% if user.first_name or user.last_name %}
+                    <p><strong>Fullname: </strong>{{ user.first_name }}{{ user.last_name }}</p>
+                {% endif %}
+                {% if user.email %}
+                    <p><strong>Email: </strong>{{ user.email }}</p>
+                {% endif %}
+                <p><strong>Joined: </strong>{{ user.date_joined }}</p>
+            </div>
+            <div class="content">
+                <p class="subtitle">Favorite movies:</p>
+                <div class="columns is-multiline">
+                    {% for favorite in user.favorite_set.all %}
+                        <div class="column is-4">
+                            <p>
+                                <a href="{% url 'movies:movie-detail' favorite.movie.pk %}">{{ favorite.movie.title }}</a>
+                                <br>
+                                <span class="has-text-grey is-size-7">
+                                    {{ favorite.date }}
+                                </span>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="content">
+                <p class="subtitle">Your scores:</p>
+                <div class="columns is-multiline">
+                    {% for score in user.score_set.all %}
+                        <div class="column is-4">
+                            <p>
+                                <a href="{% url 'movies:movie-detail' score.movie.pk %}">{{ score.movie.title }}</a>
+                                <br>
+                                <span class="has-text-grey is-size-7">
+                                    Rate: {{ score.value }}
+                                    Message:
+                                    {% if score.message %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </span>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="content">
+                <p class="subtitle">Created movies:</p>
+                <div class="columns is-multiline">
+                    {% for movie in user.movie_set.all %}
+                        <div class="column is-4">
+                            <p>
+                                <a href="{% url 'movies:movie-detail' movie.pk %}">{{ movie.title }}</a>
+                                <br>
+                                <span class="has-text-grey is-size-7">
+                                    {{ movie.release_date.year }}
+                                    {{ movie.get_type_display }}
+                                    {{ movie.get_status_display }}
+                                    {{ movie.episodes }} ep.
+                                </span>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="column"></div>
+    </div>
+{% endblock %}
