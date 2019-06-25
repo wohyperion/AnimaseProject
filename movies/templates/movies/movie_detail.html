@@ -52,17 +52,20 @@
                     {% else %}
                         <li id="favorite-button"><a href="">Favorite</a></li>
                     {% endif %}
-                    <li><a href="">Set a score</a></li>
                     {% if movie.trailer_url %}
                         <li><a href="{{ movie.trailer_url }}" target="_blank">Video trailer</a></li>
                     {% endif %}
                 </ul>
-                {% if movie.user == user or user.is_superuser %}
+                {% if movie.user == user or user.is_superuser or perms.movies.can_toggle_allowed %}
                     <p class="menu-label">Creator Actions</p>
                     <ul class="menu-list">
                         <li><a href="{% url 'movies:movie-update' movie.pk %}">Edit</a></li>
-                        {% if user.is_superuser %}
-                            <li><a href="">Hide</a></li>
+                        {% if user.is_superuser or perms.movies.can_toggle_allowed %}
+                            {% if movie.allowed == False %}
+                                <li><a id="show-button">Show</a></li>
+                            {% else %}
+                                <li><a id="hide-button">Hide</a></li>
+                            {% endif %}
                             <li><a href="">Delete</a></li>
                         {% endif %}
                     </ul>
@@ -74,7 +77,7 @@
                             <li>
                                 <a href="{% url 'movies:movie-detail' related.pk %}">
                                     {{ related.title }}
-                                    <span class="is-pulled-right">({{ related.release_date.year }})</span>
+                                    ({{ related.release_date.year }})
                                 </a>
                             </li>
                         {% endfor %}
@@ -86,7 +89,9 @@
         <div class="column">
             <div class="content">
                 <h1 class="title">{{ movie.title }}</h1>
-                <p class="subtitle">{{ movie.synonym }}</p>
+                {% if movie.synonym %}
+                    <p class="subtitle">{{ movie.synonym }}</p>
+                {% endif %}
             </div>
             <div class="columns">
                 <div class="column">
@@ -106,7 +111,7 @@
                 <div class="column">
                     <div class="content">
                         <p><strong>Source: </strong>{{ movie.get_source_display }}</p>
-                        <p><strong>Studio: </strong>{{ movie.studio.name }}</p>
+                        <p><strong>Studio: </strong>{{ movie.studio.name|default:"Unknown" }}</p>
                         <p><strong>Episodes: </strong>{{ movie.episodes }} ep.</p>
                         <p><strong>Duration: </strong>{{ movie.duration }} min. per ep.</p>
                     </div>
@@ -127,46 +132,78 @@
                         </span>
                     {% endif %}
                 </p>
-                {% if movie.score_set.all.count > 0 %}
-                    {% for score in movie.score_set.all|dictsortreversed:"date"|slice:"10" %}
-                        <article class="media">
-                            <div class="media-content">
-                                <div class="content">
-                                    <p>
-                                        {% if score.user.first_name and score.user.last_name %}
-                                            <strong>
-                                                {{ score.user.first_name }}
-                                                {{ score.user.last_name }}
-                                            </strong>
-                                            <span class="tag is-dark is-pulled-right">
-                                                {{ score.value }}
-                                            </span>
-                                            <br>
-                                            <small>
-                                                @{{ score.user.username }}
-                                                {{ score.date }}
-                                            </small>
-                                        {% else %}
-                                            <strong>@{{ score.user.username }}</strong>
-                                            <span class="tag is-dark is-pulled-right">
-                                                {{ score.value }}
-                                            </span>
-                                            <br>
-                                            <small>{{ score.date }}</small>
-                                        {% endif %}
-                                        <br>
-                                        {{ score.message }}
-                                    </p>
+                {% if not score_exist %}
+                    <article class="media">
+                        <div class="media-content">
+                            <form action="{% url 'movies:score-create' movie.pk %}" method="post">
+                                {% csrf_token %}
+                                <div class="field">
+                                    <label for="{{ score_form.message.id_for_label }}" class="label">
+                                        {{ score_form.message.label_tag }}
+                                    </label>
+                                    <div class="control">
+                                    <textarea class="textarea" name="{{ score_form.message.html_name }}"
+                                              placeholder="{{ score_form.message.help_text }}"
+                                              id="{{ score_form.message.id_for_label }}"></textarea>
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
-                    {% endfor %}
-                {% else %}
-                    <p>
-                        Nobody set a score to this anime.
-                        <a href="">You can be first!</a>
-                    </p>
+                                <div class="field">
+                                    <label for="{{ score_form.value.id_for_label }}" class="label">
+                                        {{ score_form.value.label_tag }}
+                                    </label>
+                                    <div class="field is-horizontal">
+                                        <div class="field-body">
+                                            <div class="field">
+                                                <div class="control">
+                                                    <input class="input" type="number"
+                                                           name="{{ score_form.value.html_name }}" min="0" max="10"
+                                                           placeholder="{{ score_form.value.help_text }}"
+                                                           id="{{ score_form.value.id_for_label }}"
+                                                           required>
+                                                </div>
+                                            </div>
+                                            <input type="submit" class="button is-info" value="Send">
+                                            <input type="hidden" name="next" value="{{ next }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </article>
                 {% endif %}
+                {% for score in movie.score_set.all|dictsortreversed:"date"|slice:"10" %}
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    {% if score.user.first_name and score.user.last_name %}
+                                        <strong>
+                                            {{ score.user.first_name }}
+                                            {{ score.user.last_name }}
+                                        </strong>
+                                        <span class="tag is-dark is-pulled-right">
+                                                {{ score.value }}
+                                            </span>
+                                        <br>
+                                        <small>
+                                            @{{ score.user.username }}
+                                            {{ score.date }}
+                                        </small>
+                                    {% else %}
+                                        <strong>@{{ score.user.username }}</strong>
+                                        <span class="tag is-dark is-pulled-right">
+                                                {{ score.value }}
+                                            </span>
+                                        <br>
+                                        <small>{{ score.date }}</small>
+                                    {% endif %}
+                                    <br>
+                                    {{ score.message }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
             </div>
         </div>
     </div>

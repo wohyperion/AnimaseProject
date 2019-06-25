@@ -33,4 +33,29 @@ $(document).ready(() => {
         });
         return false;
     });
+
+    $('#hide-button').click(() => {
+        $.ajax({
+            type: 'POST',
+            url: document.URL + 'hide/',
+            success: (response) => {
+                const host = window.location.host;
+                window.location = 'http://' + host + response.url;
+            }
+        });
+        return false;
+    });
+
+    $('#show-button').click(() => {
+        $.ajax({
+            type: 'POST',
+            url: document.URL + 'publish/',
+            success: (response) => {
+                if (response.success === true) {
+                    window.location.reload();
+                }
+            }
+        });
+        return false;
+    });
 });

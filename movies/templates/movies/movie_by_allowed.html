@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column is-8">
+            <div class="content">
+                {% if not movie_list %}
+                    <h1 class="title has-text-grey">Nothing to show...</h1>
+                    <p class="subtitle has-text-grey-light">This section is empty now!</p>
+                    <a href="{% url 'movies:index' %}">Go to all anime list...</a>
+                {% endif %}
+                {% for movie in movie_list %}
+                    <p>
+                        <strong class="title">
+                            <a href="{% url 'movies:movie-detail' movie.pk %}">{{ movie.title }}</a>
+                        </strong>
+                        <br>
+                        <strong>ID:</strong>
+                        <span class="movie-id" style="margin-right: 10px;">
+                            {{ movie.pk }}
+                        </span>
+                        <strong>User:</strong>
+                        <span style="margin-right: 10px;">{{ movie.user }}</span>
+                        <strong>Added:</strong>
+                        <span>{{ movie.added_date }}</span>
+                    </p>
+                    <div class="tags">
+                        <span class="tag {% if movie.synonym %}is-success{% endif %}">Synonym</span>
+                        <span class="tag {% if movie.release_date %}is-success{% endif %}">Release date</span>
+                        <span class="tag {% if movie.end_date %}is-success{% endif %}">End date</span>
+                        <span class="tag {% if movie.studio %}is-success{% endif %}">Studio</span>
+                        <span class="tag {% if movie.summary %}is-success{% endif %}">Summary</span>
+                        <span class="tag {% if movie.cover_url %}is-success{% endif %}">Cover</span>
+                        <span class="tag {% if movie.trailer_url %}is-success{% endif %}">Trailer</span>
+                    </div>
+                    <form action="{% url 'movies:movie-set-allow' movie.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="button is-info" value="Publish">
+                    </form>
+                    {% if not forloop.last %}
+                        <hr>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="column"></div>
+    </div>
+{% endblock %}

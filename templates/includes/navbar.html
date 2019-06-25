@@ -28,7 +28,11 @@
                         <a href="" class="button is-primary">
                             <strong>Sign up</strong>
                         </a>
-                        <a href="{% url 'login' %}?next=/movies/" class="button">Login</a>
+                        {% if not next %}
+                            <a href="{% url 'login' %}?next=/movies/" class="button">Login</a>
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ next }}" class="button">Login</a>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}

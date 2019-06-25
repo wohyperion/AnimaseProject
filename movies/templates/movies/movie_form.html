@@ -2,6 +2,16 @@
 
 {% block content %}
     <h1 class="title">Add new anime</h1>
+    {% if form.errors %}
+        <div class="notification is-warning">
+            <p>Several errors occurred!</p>
+            <ul>
+                {% for field in form %}
+                    <li>{{ field.errors|striptags }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <form action="." method="post">
         {% csrf_token %}
         <div class="columns is-multiline">

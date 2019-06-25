@@ -12,20 +12,28 @@
             <aside class="menu">
                 <p class="menu-label">Actions</p>
                 <ul class="menu-list">
-                    <li><a href="{% url 'movies:movie-create' %}">New Anime</a></li>
-                    <li><a href="">New Genre</a></li>
+                    <li><a href="{% url 'movies:movie-create' %}">Create new anime</a></li>
+                    {% if perms.movies.can_toggle_allowed or request.user.is_superuser %}
+                        <li>
+                            <a href="{% url 'movies:movie-allowed' %}">
+                                Manage hidden anime
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <p class="menu-label">Popular Genres</p>
                 <ul class="menu-list">
                     <li><a href="{% url 'movies:index' %}">All genres</a></li>
                     <hr class="is-marginless">
                     {% for genre in genre_list|dictsortreversed:"movie_set.all.count"|slice:":20" %}
-                        <li>
-                            <a href="{% url 'movies:genre-detail' genre.title %}">
-                                {{ genre }}
-                                <span class="is-pulled-right">{{ genre.movie_set.all.count }}</span>
-                            </a>
-                        </li>
+                        {% if genre.movie_set.count %}
+                            <li>
+                                <a href="{% url 'movies:genre-detail' genre.title %}">
+                                    {{ genre }}
+                                    <span class="is-pulled-right">{{ genre.movie_set.all.count }}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </aside>
@@ -33,30 +41,35 @@
         <div class="column">
             <div class="columns is-multiline">
                 {% for movie in movie_list %}
-                    <div class="column is-3">
-                        <figure class="image is-4by5">
-                            {# TODO: Create static styles.css #}
-                            <a href="{% url 'movies:movie-detail' movie.pk %}">
-                                <img src="{{ movie.cover_url }}" alt="Movie cover"
-                                     style="object-fit: cover; object-position: center;">
-                            </a>
-                        </figure>
-                        <br>
-                        <div class="content">
-                            <a href="{% url 'movies:movie-detail' movie.pk %}">
-                                <p class="subtitle">{{ movie.title }}</p>
-                            </a>
-                            {{ movie.release_date.year }}
-                            {{ movie.get_type_display }}
-                            {{ movie.get_status_display }}
-                            {{ movie.episodes }} ep.
-                            <div class="content is-small">
-                                {% for genre_element in movie.genre.all %}
-                                    <a href="{% url 'movies:genre-detail' genre_element.title %}">{{ genre_element }}</a>
-                                {% endfor %}
+                    {% if movie.allowed %}
+                        <div class="column is-3">
+                            <figure class="image is-4by5">
+                                {# TODO: Create static styles.css #}
+                                <a href="{% url 'movies:movie-detail' movie.pk %}">
+                                    <img src="{{ movie.cover_url }}" alt="Movie cover"
+                                         style="object-fit: cover; object-position: center;">
+                                </a>
+                            </figure>
+                            <br>
+                            <div class="content">
+                                <a href="{% url 'movies:movie-detail' movie.pk %}">
+                                    <p class="subtitle">{{ movie.title }}</p>
+                                </a>
+                                <span class="has-text-grey is-size-7">
+                                    {{ movie.release_date.year }}
+                                    {{ movie.get_type_display }}
+                                    {{ movie.get_status_display }}
+                                    {{ movie.episodes }} ep.
+                                </span>
+                                <div class="content is-small">
+                                    {% for genre_element in movie.genre.all %}
+                                        <a class="has-text-grey"
+                                           href="{% url 'movies:genre-detail' genre_element.title %}">{{ genre_element }}</a>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
             {% include 'movies/includes/paginator.html' %}
