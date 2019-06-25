@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -101,6 +102,7 @@ class Movie(models.Model):
 
     class Meta:
         ordering = ['-added_date']
+        permissions = [('can_toggle_allowed', 'Can toggle allowed')]
 
     # Methods
     def __str__(self):
@@ -131,6 +133,14 @@ class Score(models.Model):
         unique_together = ('movie', 'user')
 
     # Methods
+    @classmethod
+    def score_exist(cls, movie, user):
+        try:
+            cls.objects.get(movie=movie, user=user)
+            return True
+        except ObjectDoesNotExist:
+            return False
+
     def __str__(self):
         return '{0} ({1})'.format(self.user.username, self.movie.title)
 
