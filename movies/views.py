@@ -1,15 +1,18 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse_lazy, reverse
 from django.core.serializers import serialize
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from .models import (Movie, Genre, Score, Favorite, Studio)
-from .forms import (MovieForm)
+from .forms import (MovieForm, ScoreForm)
 
 
+# General website page [index]
 class MovieListView(ListView):
     model = Movie
     paginate_by = 24
@@ -21,11 +24,20 @@ class MovieListView(ListView):
         return context
 
 
+# Detailed movie page [movie-detail]
 class MovieDetailView(DetailView):
     model = Movie
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().allowed and not self.request.user.is_superuser and not self.request.user.has_perm(
+                'movies.can_toggle_allowed'):
+            return redirect('movies:index')
+
+        return super(MovieDetailView, self).dispatch(request=request)
+
     def get_context_data(self, **kwargs):
         context = super(MovieDetailView, self).get_context_data()
+        score_form = ScoreForm()
 
         try:
             favorite = Favorite.objects.get(movie_id=self.kwargs['pk'], user_id=self.request.user.pk)
@@ -33,9 +45,17 @@ class MovieDetailView(DetailView):
             favorite = None
 
         context['favorite'] = favorite
+        context['score_form'] = score_form
+
+        if self.request.user.is_authenticated:
+            context['score_exist'] = Score.score_exist(movie=self.object, user=self.request.user)
+        else:
+            context['score_exist'] = True
+
         return context
 
 
+# Movie filter by genres. General access from index page [genre-detail]
 class MovieByGenreListView(ListView):
     model = Movie
     paginate_by = 24
@@ -53,6 +73,65 @@ class MovieByGenreListView(ListView):
         return context
 
 
+# Administrators and creators page for publication movies which added by usual user [movie-allowed]
+class MovieByAllowedListVew(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Movie
+    paginate_by = 24
+    template_name = 'movies/movie_by_allowed.html'
+    ordering = ['-added_date']
+    login_url = reverse_lazy('login')
+    permission_required = ['movies.can_toggle_allowed']
+    permission_denied_message = 'You\'r should be creator!'
+
+    def get_queryset(self):
+        return Movie.objects.filter(allowed=False)
+
+
+# Endpoint for set True to allowed status of movie [movie-set-allow]
+class MovieShowView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    http_method_names = ['post']
+    login_url = reverse_lazy('login')
+    permission_required = ['movies.can_toggle_allowed']
+    permission_denied_message = 'You\'r should be creator!'
+
+    @staticmethod
+    def post(request, pk):
+        try:
+            movie = Movie.objects.get(pk=pk)
+            movie.allowed = True
+            movie.save()
+            if request.is_ajax():
+                return JsonResponse({
+                    'success': True
+                })
+            else:
+                return redirect('movies:movie-allowed')
+        except ObjectDoesNotExist as error:
+            raise error
+
+
+# Endpoint for set False to allowed status of movie [movie-hide]
+class MovieHideView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    http_method_names = ['post']
+    login_url = reverse_lazy('login')
+    permission_required = ['movies.can_toggle_allowed']
+    permission_denied_message = 'You\'r should be creator!'
+
+    @staticmethod
+    def post(request, pk):
+        try:
+            movie = Movie.objects.get(pk=pk)
+            movie.allowed = False
+            movie.save()
+            return JsonResponse({
+                'success': True,
+                'url': reverse('movies:index')
+            })
+        except ObjectDoesNotExist as error:
+            raise error
+
+
+# Page for adding a new movie to site [movie-create]
 class MovieCreateView(LoginRequiredMixin, CreateView):
     model = Movie
     login_url = reverse_lazy('login')
@@ -68,6 +147,7 @@ class MovieCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
+# Based on MovieCreateView page for updating movie information [movie-update]
 class MovieUpdateView(LoginRequiredMixin, UpdateView):
     model = Movie
     login_url = reverse_lazy('login')
@@ -94,12 +174,22 @@ class MovieUpdateView(LoginRequiredMixin, UpdateView):
 
         return context
 
+    def get_object(self, queryset=None):
+        obj = super(MovieUpdateView, self).get_object()
 
+        if obj.user == self.request.user or self.request.user.has_perm('movies.can_toggle_allowed'):
+            return obj
+
+        raise PermissionDenied()
+
+
+# Endpoint for create new genres on MovieCreateView/MovieUpdateView pages [genre-create]
 class GenreModalView(View):
     http_method_names = ['post']
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated and not request.is_ajax:
+    @staticmethod
+    def post(request):
+        if not request.user.is_authenticated and not request.is_ajax():
             return HttpResponseForbidden()
         else:
             obj, created = Genre.objects.get_or_create(title=request.POST.get('title'))
@@ -110,32 +200,49 @@ class GenreModalView(View):
         return HttpResponse(created)
 
 
-# TODO: delete if dont need it and clean urls
-class GenreListView(View):
-    http_method_names = ['get']
-
-    def get(self, request):
-        queryset = Genre.objects.all().only('title')
-        data = serialize('json', Genre.objects.all(), fields='title')
-        return JsonResponse(data, safe=False)
-
-
+# A list of all latest scores [score-list]
 class ScoreListView(ListView):
     model = Score
     paginate_by = 24
     ordering = ['-date']
 
 
-class FavoriteMovieView(View):
-    http_method_names = ['post', 'delete']
+class ScoreCreateView(LoginRequiredMixin, View):
+    http_method_names = ['post']
+    login_url = reverse_lazy('login')
 
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, pk):
+        form = ScoreForm(request.POST)
+
+        try:
+            if form.is_valid():
+                movie = Movie.objects.get(pk=pk)
+                user = User.objects.get(pk=request.user.pk)
+                score = Score(
+                    movie=movie,
+                    user=user,
+                    value=form.cleaned_data.get('value'),
+                    message=form.cleaned_data.get('message')
+                )
+                score.save()
+                return redirect('movies:movie-detail', pk)
+        except ObjectDoesNotExist as error:
+            raise error
+
+
+# Endpoint for adding favorite movies to user profile [movie-favorite]
+class MovieFavoriteView(View):
+    http_method_names = ['post']
+
+    @staticmethod
+    def post(request, pk):
         if not request.user.is_authenticated:
             return HttpResponseForbidden()
 
-        if get_object_or_404(Movie, pk=self.kwargs['pk']):
+        if get_object_or_404(Movie, pk=pk):
             obj, created = Favorite.objects.get_or_create(
-                movie_id=self.kwargs['pk'],
+                movie_id=pk,
                 user_id=request.user.pk
             )
 
@@ -145,11 +252,13 @@ class FavoriteMovieView(View):
             return HttpResponse(created)
 
 
+# Endpoint for create new studios on MovieCreateView/MovieUpdateView pages [studio-create]
 class StudioModalView(View):
     http_method_names = ['post']
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated and not request.is_ajax:
+    @staticmethod
+    def post(request):
+        if not request.user.is_authenticated and not request.is_ajax():
             return HttpResponseForbidden()
         else:
             obj, created = Studio.objects.get_or_create(name=request.POST.get('name'))
