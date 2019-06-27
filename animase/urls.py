@@ -18,10 +18,14 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from django.contrib.auth import views as auth_views
 
+from movies.views import SignUpView, UserDetailView
+
 urlpatterns = [
     path('', RedirectView.as_view(url='/movies/', permanent=True)),
     path('movies/', include('movies.urls')),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('accounts/signup/', SignUpView.as_view(), name='signup'),
+    path('accounts/profile/', UserDetailView.as_view(), name='profile'),
     path('admin/', admin.site.urls),
 ]

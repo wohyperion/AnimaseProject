@@ -8,7 +8,7 @@
                 <p class="subtitle">Profile info:</p>
                 <p><strong>Username: </strong>{{ user.username }}</p>
                 {% if user.first_name or user.last_name %}
-                    <p><strong>Fullname: </strong>{{ user.first_name }}{{ user.last_name }}</p>
+                    <p><strong>Fullname: </strong>{{ user.first_name }} {{ user.last_name }}</p>
                 {% endif %}
                 {% if user.email %}
                     <p><strong>Email: </strong>{{ user.email }}</p>
@@ -30,6 +30,9 @@
                         </div>
                     {% endfor %}
                 </div>
+                {% if user.favorite_set.count == 0 %}
+                    <p class="has-text-grey is-size-7">Section is empty...</p>
+                {% endif %}
             </div>
             <div class="content">
                 <p class="subtitle">Your scores:</p>
@@ -52,6 +55,9 @@
                         </div>
                     {% endfor %}
                 </div>
+                {% if user.score_set.count == 0 %}
+                    <p class="has-text-grey is-size-7">Section is empty...</p>
+                {% endif %}
             </div>
             <div class="content">
                 <p class="subtitle">Created movies:</p>
@@ -71,6 +77,9 @@
                         </div>
                     {% endfor %}
                 </div>
+                {% if user.movie_set.count == 0 %}
+                    <p class="has-text-grey is-size-7">Section is empty...</p>
+                {% endif %}
             </div>
         </div>
         <div class="column"></div>

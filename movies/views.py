@@ -9,7 +9,7 @@ from django.core.serializers import serialize
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 
 from .models import (Movie, Genre, Score, Favorite, Studio)
-from .forms import (MovieForm, ScoreForm)
+from .forms import (MovieForm, ScoreForm, UserForm)
 
 
 # General website page [index]
@@ -289,3 +289,24 @@ class UserDetailView(LoginRequiredMixin, TemplateView):
         context['user'] = user
 
         return context
+
+
+class SignUpView(FormView):
+    form_class = UserForm
+    template_name = 'registration/signup.html'
+    success_url = reverse_lazy('login')
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            user = User.objects.create_user(
+                username=form.cleaned_data.get('username'),
+                password=form.cleaned_data.get('password'),
+                email=form.cleaned_data.get('email')
+            )
+            user.first_name = form.cleaned_data.get('first_name')
+            user.last_name = form.cleaned_data.get('last_name')
+            user.save()
+
+        return redirect('login')

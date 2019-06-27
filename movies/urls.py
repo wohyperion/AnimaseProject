@@ -17,6 +17,6 @@ urlpatterns = [
     path('scores/', views.ScoreListView.as_view(), name='score-list'),
     path('genres/create/', views.GenreModalView.as_view(), name='genre-create'),
     path('studios/create/', views.StudioModalView.as_view(), name='studio-create'),
-    path('user/', views.UserDetailView.as_view(), name='user-detail'),
+    # path('user/', views.UserDetailView.as_view(), name='user-detail'),
     path('<genre>/', views.MovieByGenreListView.as_view(), name='genre-detail'),
 ]

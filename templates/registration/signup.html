@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column is-6">
+            <div class="content">
+                <h1 class="title">Registration</h1>
+                <form action="{% url 'signup' %}" method="post">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="notification is-warning">
+                            <p>Several errors occurred!</p>
+                            <ul>
+                                {% for field in form %}
+                                    <li>{{ field.errors|striptags }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="field">
+                        <label class="label" for="{{ form.username.id_for_label }}">
+                            {{ form.username.label_tag }}
+                        </label>
+                        <div class="control">
+                            <input class="input" type="text" required name="{{ form.username.html_name }}"
+                                   id="{{ form.username.id_for_label }}" placeholder="{{ form.username.help_text }}"
+                                   maxlength="150">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="{{ form.password.id_for_label }}">
+                            {{ form.password.label_tag }}
+                        </label>
+                        <div class="control">
+                            <input class="input" type="password" required name="{{ form.password.html_name }}"
+                                   id="{{ form.password.id_for_label }}" placeholder="{{ form.password.help_text }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="{{ form.first_name.id_for_label }}">
+                            {{ form.first_name.label_tag }}
+                        </label>
+                        <div class="control">
+                            <input class="input" type="text" name="{{ form.first_name.html_name }}"
+                                   id="{{ form.first_name.id_for_label }}"
+                                   placeholder="{{ form.first_name.help_text }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="{{ form.last_name.id_for_label }}">
+                            {{ form.last_name.label_tag }}
+                        </label>
+                        <div class="control">
+                            <input class="input" type="text" name="{{ form.last_name.html_name }}"
+                                   id="{{ form.last_name.id_for_label }}" placeholder="{{ form.last_name.help_text }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="{{ form.email.id_for_label }}">
+                            {{ form.email.label_tag }}
+                        </label>
+                        <div class="control">
+                            <input class="input" type="email" name="{{ form.email.html_name }}"
+                                   id="{{ form.email.id_for_label }}" placeholder="{{ form.email.help_text }}">
+                        </div>
+                    </div>
+
+                    <input type="submit" class="button is-success" value="Submit">
+                </form>
+            </div>
+        </div>
+        <div class="column"></div>
+    </div>
+{% endblock %}
