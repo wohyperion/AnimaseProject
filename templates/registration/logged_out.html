@@ -1,5 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>Logged out!</p>
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column is-6">
+            <h1 class="title">Logged out!</h1>
+
+            <ul>
+                <li><a href="{% url 'movies:index' %}">Main page</a></li>
+                <li><a href="{% url 'signup' %}">Sign up</a></li>
+                <li><a href="{% url 'login' %}">Login again</a></li>
+            </ul>
+        </div>
+        <div class="column"></div>
+    </div>
 {% endblock %}
